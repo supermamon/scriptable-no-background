@@ -12,9 +12,8 @@ Description :
 
 const nobg = importModule('no-background.js')
 
-var widget = new ListWidget()
-
-widget.backgroundImage = await nobg.getSlice('small-top-left')
+const widget = new ListWidget()
+widget.backgroundImage = await nobg.getSlice('medium-top')
 
 var msg = `Hello Scriptable!`
 var mode = widget.addText(msg)
