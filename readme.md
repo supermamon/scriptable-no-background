@@ -1,6 +1,6 @@
 # no-background.js
 
-A module to emulte transparent backgrounds for Scriptable widgets.
+A module to emulate transparent backgrounds for Scriptable.app widgets.
 
 **Features**
 * Interactive Configuration
