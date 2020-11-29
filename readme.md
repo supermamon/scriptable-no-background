@@ -1,12 +1,12 @@
 # no-background.js
 
-A module to create illusions of transparent backgrounds for Scriptable widgets.
+A module to emulte transparent backgrounds for Scriptable widgets.
 
 **Features**
 * Interactive Configuration
 * Dark and Light mode support
 * Methods to get the actual background image or the image path
-* Store widget positions
+* Store/reset widget positions
 * Option for semi-transparent style
 
 --- 
@@ -17,54 +17,64 @@ A module to create illusions of transparent backgrounds for Scriptable widgets.
 2. Add the following code in your widget code
 
     ```javascript
-    const nobg = importModule('no-background.js')
+    const { transparent } = importModule('no-background')
+
     const widget = new ListWidget()
-    widget.backgroundImage = await  nobg.getSliceForWidget(Script.name())
+    widget.backgroundImage = await transparent(Script.name())
 
     // the rest of your widget code 
     ```
 3. Run your widget!
 
+*The `transparent` is an alias for the original `getSliceForWidget` method. You can use them interchangably.*
+
 --- 
 
 ## More Options
 
+<br />
+
 ### Update the background after you moved your widget's position
 
-The `getSliceForWidget` method has an optional second boolean argument to prompt for a new widget position. This is useful when you changed the position of the widget on your home screen. 
+The `transparent` method has an optional second boolean argument to prompt for a new widget position. This is useful when you changed the position of the widget on your home screen. 
 
 ```javascript
-const RESET_POSITION = true
+const RESET_BACKGROUND = true
 
-const nobg = importModule('no-background,js')
+const { transparent } = importModule('no-background')
+
 const widget = new ListWidget()
-widget.backgroundImage = await nobg.getSliceForWidget(Script.name(), RESET_POSITION)
+widget.backgroundImage = await transparent(Script.name(), RESET_BACKGROUND)
 
 // the rest of your widget code 
 ```
 
-*Tip: Change `const RESET_POSITION = true` to `const RESET_POSITION = !config.runsInWidget` to automatcally prompt for a new position every time you run the script inside the app*
+*Tip: Change `const RESET_BACKGROUND = true` to `const RESET_BACKGROUND = !config.runsInWidget` to automatcally prompt for a new position every time you run the script inside the app*
 
+<br>
 
 ### Changing Your Wallpaper
+
   
-Now, you may want update the backgrounds after you change your wallpaper. For that, you can download the companion utility script [No Background Config.js](No%20Background%20Config.js).
+Now, you may want update the backgrounds after you change your wallpaper. For that, run the no-bacground module by itself.
 
-Download the script and run it.
+You will be presented with 2 options, `Generate Slices` and `Clear Widget Positions Cache`.
 
-This script has 2 options, `Generate Slices` and `Clear Widget Positions Cache`.
 Use the `Generate Slices` option to update backgrounds from your current wallpaper.
+
 `Clear Widget Positions Cache` will delete all saved positions from all widgets.
 You'll have to run each individual widget to setup their positions.
 
+<br>
 
 ### Static Location
 
 If you have widgets that you are most likely not to move around, you can specify a its position using the `getSlice` method.
 
 ```javascript
-const nobg = importModule('no-background.js')
-const widget = new ListWidget();
+const nobg = importModule('no-background')
+
+const widget = new ListWidget()
 widget.backgroundImage = await nobg.getSlice('medium-top')
 
 // the rest of your widget code 
@@ -78,6 +88,7 @@ Valid slice names are:
 - `medium-top` /  `medium-middle` / `medium-bottom`
 - `large-top` / `large-bottom`
 
+<br>
 
 ### Getting the path instead of the actual image
 
@@ -94,6 +105,8 @@ widget.backgroundImage = Image.fromFile(bgpath)
 ```
 
 *Like the `getSliceForWidget` method, both the `getSlice` and `getPathForSlice` also prompt for setup if the slices don't exist.*
+
+<br>
 
 ## Examples
 

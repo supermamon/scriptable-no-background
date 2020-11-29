@@ -16,6 +16,10 @@ invisible widget shared on the Automtors discourse
 https://talk.automators.fm/t/widget-examples/7994/135
 
 Changelog   :
+v1.6.0
+- (new) `transparent` and `for` alias to `getSliceForWidget`
+- (new) merged `No Background Config` code to maintain 1 code
+- (new) auto-detect iCloud usage
 v1.5.0 
 - (update) iPhone 12 Pro Max compatibility
 v1.4.0 
@@ -39,16 +43,16 @@ v1.0.1
 - Fix iamge does not exists issue
 ----------------------------------------------- */
 
-//set true to use local file system
-const LOCAL_CACHE = false 
+
 const ALERTS_AS_SHEETS = false
 
-let fm = LOCAL_CACHE ? FileManager.local() : FileManager.iCloud()
+const USES_ICLOUD = usesiCloud() 
+const fm = FileManagerAdaptive()
 const CACHE_FOLDER = 'cache/nobg'
+const cachePath = fm.joinPath(fm.documentsDirectory(), CACHE_FOLDER);
 
-let cachePath = fm.joinPath(fm.documentsDirectory(), CACHE_FOLDER);
 
-var exports = {}
+const exports = {}
 
 //------------------------------------------------
 exports.cachePath = cachePath
@@ -121,7 +125,7 @@ exports.generateSlices = async function({caller='none'}) {
       if (fm.fileExists(imgPath)) {
         // sometimes it wouldn't overwrite. 
         // so better delete the file first
-        if (!LOCAL_CACHE) await fm.downloadFileFromiCloud(imgPath)
+        if (USES_ICLOUD) await fm.downloadFileFromiCloud(imgPath)
         try {fm.remove(imgPath)} catch (e) {}
       }
       fm.writeImage(imgPath,imgCrop)
@@ -141,7 +145,9 @@ exports.generateSlices = async function({caller='none'}) {
   return true 
  
 }
-exports.applyTint = function(widget, tint, alpha) {
+//------------------------------------------------
+exports.applyTint = function(widget, tint, alpha) 
+{
   tint = tint || '#ffffff'
   alpha = alpha || 0.2
 
@@ -154,7 +160,9 @@ exports.applyTint = function(widget, tint, alpha) {
 }
 //------------------------------------------------
 exports.getSlice = async function(name) {
-  let appearance = (await isUsingDarkAppearance()) ? 'dark' : 'light'
+  let appearance = (await isUsingDarkAppearance()) 
+                    ? 'dark' 
+                    : 'light'
 
   let position = name
   //log(position)
@@ -167,14 +175,16 @@ exports.getSlice = async function(name) {
     }
   }
 
-  if (!LOCAL_CACHE) await fm.downloadFileFromiCloud(imgPath)
+  if (USES_ICLOUD) await fm.downloadFileFromiCloud(imgPath)
 
   let image =  fm.readImage(imgPath)
   return image
 }
 //------------------------------------------------
 exports.getPathForSlice = async function(slice_name) {
-  let appearance = (await isUsingDarkAppearance()) ? 'dark' : 'light'
+  let appearance = (await isUsingDarkAppearance()) 
+                    ? 'dark' 
+                    : 'light'
   let imgPath = fm.joinPath(cachePath, 
     `${appearance}-${slice_name}.jpg`)
     
@@ -185,12 +195,18 @@ exports.getPathForSlice = async function(slice_name) {
     imgPath = null
   }
   
-  if (!LOCAL_CACHE && fileExists) await fm.downloadFileFromiCloud(imgPath)
+  if (USES_ICLOUD && fileExists) await fm.downloadFileFromiCloud(imgPath)
   return imgPath
 }
 //------------------------------------------------
-exports.getSliceForWidget = async function(instance_name, reset=false) {
-  const appearance = (await isUsingDarkAppearance()) ? 'dark' : 'light'  
+exports.getSliceForWidget = async function(
+                                instance_name, 
+                                reset=false) 
+{
+
+  let appearance = (await isUsingDarkAppearance()) 
+                    ? 'dark' 
+                    : 'light'
   var cfg = await loadConfig()
   var position = reset ? null : cfg[instance_name]
   if (!position) {
@@ -225,11 +241,14 @@ exports.getSliceForWidget = async function(instance_name, reset=false) {
     return null
   }
 
-  if (!LOCAL_CACHE) await fm.downloadFileFromiCloud(imgPath)
+  if (USES_ICLOUD) await fm.downloadFileFromiCloud(imgPath)
 
   let image =  fm.readImage(imgPath)
   return image
 }
+//------------------------------------------------
+exports.for = exports.getSliceForWidget
+exports.transparent = exports.getSliceForWidget
 //------------------------------------------------
 exports.chooseBackgroundSlice = async function(name) {
 
@@ -271,7 +290,7 @@ async function loadConfig() {
     await fm.writeString(configPath,"{}")
     return {}
   } else {
-    if (!LOCAL_CACHE) await fm.downloadFileFromiCloud(configPath)
+    if (USES_ICLOUD) await fm.downloadFileFromiCloud(configPath)
     const strConf = fm.readString(configPath)
     const cfg = JSON.parse(strConf)  
     return cfg
@@ -279,20 +298,30 @@ async function loadConfig() {
 }
 //------------------------------------------------
 async function saveConfig(cfg) {
-  const configPath = fm.joinPath(cachePath, "widget-positions.json")
-  if (!LOCAL_CACHE) await fm.downloadFileFromiCloud(configPath)
-  await fm.writeString(configPath, JSON.stringify(cfg))
+  const configPath = fm.joinPath(
+                        cachePath, 
+                        "widget-positions.json")
+  if (USES_ICLOUD) {
+    await fm.downloadFileFromiCloud(configPath)
+  }
+  await fm.writeString(configPath, 
+                       JSON.stringify(cfg))
   return cfg
 }
 //------------------------------------------------
-async function presentAlert(prompt, items, asSheet) {
+async function presentAlert(prompt=""
+                            , items=["OK"]
+                            , asSheet=false) 
+{
   let alert = new Alert()
   alert.message = prompt
   
-  for (const item of items) {
-    alert.addAction(item)
+  for (var n=0; n<items.length;n++) {
+    alert.addAction(items[n])
   }
-  let resp = asSheet ? await alert.presentSheet() : await alert.presentAlert()
+  let resp = asSheet 
+            ? await alert.presentSheet() 
+            : await alert.presentAlert()
   return resp
 }
 //------------------------------------------------
@@ -417,6 +446,45 @@ async function isUsingDarkAppearance() {
   let r = await wv.evaluateJavaScript(js)
   return r
 }
+//------------------------------------------------
+function usesiCloud() {
+  return module.filename
+          .includes('Documents/iCloud~')
+}
+//------------------------------------------------
+function FileManagerAdaptive() {
+  return module.filename
+          .includes('Documents/iCloud~') 
+          ? FileManager.iCloud() 
+          : FileManager.local()
+}
 
 module.exports = exports
 
+// -- END OF MODULE CODE --
+
+// if running self run config
+const module_name = module.filename.match(/[^\/]+$/)[0].replace('.js','')
+if (module_name == Script.name()) {
+  await (async ()=>{
+    let opts = [
+        'Generate Slices',
+        'Clear Widget Positions Cache',
+        'Cancel'
+    ]
+    
+    let resp = await presentAlert( 
+      'No Background Configurator',opts, ALERTS_AS_SHEETS)
+    switch (opts[resp]) {
+      case 'Generate Slices':
+        await exports.generateSlices({})
+        break;
+      case 'Clear Widget Positions Cache':
+        await exports.resetConfig()
+        await presentAlert('Cleared')
+        break;
+      default:
+    }
+  })()
+  
+} 
