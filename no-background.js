@@ -441,10 +441,7 @@ function cropImage(img,rect) {
 }
 //------------------------------------------------
 async function isUsingDarkAppearance() {
-  const wv = new WebView()
-  let js ="(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches)"
-  let r = await wv.evaluateJavaScript(js)
-  return r
+  return !(Color.dynamic(Color.white(),Color.black()).red)
 }
 //------------------------------------------------
 function usesiCloud() {
