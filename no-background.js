@@ -6,7 +6,7 @@
 
 Script      : no-background.js
 Author      : me@supermamon.com
-Version     : 1.5.0
+Version     : 1.7.0
 Description :
   A module to create illusions of transparent
   backgrounds for Scriptable widgets
@@ -16,6 +16,8 @@ invisible widget shared on the Automtors discourse
 https://talk.automators.fm/t/widget-examples/7994/135
 
 Changelog   :
+v1.7.0
+- (new) support for iPhone 12 Mini. Thanks @blacksector
 v1.6.0
 - (new) `transparent` and `for` alias to `getSliceForWidget`
 - (new) merged `No Background Config` code to maintain 1 code
