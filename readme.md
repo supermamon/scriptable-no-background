@@ -13,7 +13,7 @@ A module to emulate transparent backgrounds for Scriptable.app widgets.
 
 ## The 3-Step Setup
 
-1. Download both [no-background.js](no-background.js)
+1. Download [no-background.js](no-background.js)
 2. Add the following code in your widget code
 
     ```javascript
