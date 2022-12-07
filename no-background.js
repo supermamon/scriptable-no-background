@@ -17,6 +17,8 @@ https://talk.automators.fm/t/widget-examples/7994/135
 
 
 Changelog   :
+v1.8.1
+- (fix) getPathForSlice returns empty string
 v1.8.0
 - (new) BREAKING CHANGE: background assignments
   are unique per device so that each device can
@@ -230,8 +232,6 @@ exports.getPathForSlice = async function (slice_name) {
   let fileExists = fm.fileExists(imgPath)
   if (!fileExists) {
     fileExists = await exports.generateSlices('self')
-  } else {
-    imgPath = null
   }
 
   if (USES_ICLOUD && fileExists) await fm.downloadFileFromiCloud(imgPath)
